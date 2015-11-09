@@ -81,11 +81,13 @@ public final class NuCharsetDecoder
     *        stderr
     * @param closed true if stdout or stderr was closed, false otherwise
     */
-   public void onOutput(ByteBuffer buffer, boolean closed)
+   public boolean onOutput(ByteBuffer buffer, boolean closed)
    {
       CoderResult coderResult = decoder.decode(buffer, charBuffer, /* endOfInput */ closed);
       charBuffer.flip();
-      this.handler.onDecode(charBuffer, closed, coderResult);
+      boolean more = this.handler.onDecode(charBuffer, closed, coderResult);
       charBuffer.compact();
+
+      return more;
    }
 }

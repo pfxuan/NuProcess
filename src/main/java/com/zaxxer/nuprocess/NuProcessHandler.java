@@ -110,7 +110,7 @@ public interface NuProcessHandler
     * @param buffer a {@link ByteBuffer} containing received stdout data
     * @param closed {@code true} if EOF has been reached
     */
-   void onStdout(ByteBuffer buffer, boolean closed);
+   boolean onStdout(ByteBuffer buffer, boolean closed);
 
    /**
     * This method is invoked when there is stderr data to process or an the
@@ -153,7 +153,7 @@ public interface NuProcessHandler
     * @param buffer a {@link ByteBuffer} containing received stderr data
     * @param closed {@code true} if EOF has been reached
     */
-   void onStderr(ByteBuffer buffer, boolean closed);
+   boolean onStderr(ByteBuffer buffer, boolean closed);
 
    /**
     * This method is invoked after you have expressed a desire to write to stdin

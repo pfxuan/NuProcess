@@ -10,6 +10,8 @@ import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.zaxxer.nuprocess.NuProcess.Stream;
+
 public class ThreadedTest
 {
    @Before
@@ -69,13 +71,14 @@ public class ThreadedTest
                handlers[i] = new LottaProcessHandler();
                pb.setProcessListener(handlers[i]);
                processes[i] = pb.start();
+               processes[i].want(Stream.STDOUT);
                // System.err.printf("  thread %d starting process %d: %s\n", id, i + 1, processes[i].toString());
             }
 
             // Kick all of the processes to start going
             for (NuProcess process : processes) {
                // System.err.printf("  Thread %d calling wantWrite() on process: %s\n", id, process.toString());
-               process.wantWrite();
+               process.want(Stream.STDIN);
             }
 
             for (NuProcess process : processes) {
@@ -146,7 +149,7 @@ public class ThreadedTest
       }
 
       @Override
-      public void onStdout(ByteBuffer buffer, boolean closed)
+      public boolean onStdout(ByteBuffer buffer, boolean closed)
       {
          size += buffer.remaining();
 
@@ -154,8 +157,11 @@ public class ThreadedTest
          buffer.get(bytes);
          readAdler32.update(bytes);
 
-         if (size == LIMIT)
+         if (size == LIMIT) {
             nuProcess.closeStdin(true);
+         }
+
+         return true;
       }
 
       @Override

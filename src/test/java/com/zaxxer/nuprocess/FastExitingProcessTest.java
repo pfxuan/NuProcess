@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 
 import com.sun.jna.Platform;
+import com.zaxxer.nuprocess.NuProcess.Stream;
 
 public class FastExitingProcessTest
 {
@@ -47,7 +48,7 @@ public class FastExitingProcessTest
       }
 
       @Override
-      public void onStdout(ByteBuffer buffer, boolean closed)
+      public boolean onStdout(ByteBuffer buffer, boolean closed)
       {
          try {
             stdoutBytesChannel.write(buffer);
@@ -55,6 +56,8 @@ public class FastExitingProcessTest
          catch (Exception e) {
             stdoutException = e;
          }
+
+         return !closed;
       }
    }
 
@@ -72,7 +75,10 @@ public class FastExitingProcessTest
       else {
          process = new NuProcessBuilder(handler, "echo", "hello").start();
       }
+
+      process.want(Stream.STDOUT);
       int retVal = process.waitFor(Long.MAX_VALUE, TimeUnit.SECONDS);
+
       assertThat("Process should exit cleanly", retVal, equalTo(0));
       assertThat("Process callback should indicate clean exit", handler.exitCode, equalTo(0));
       assertThat("No exceptions thrown writing to stdout", handler.stdoutException, is(nullValue()));

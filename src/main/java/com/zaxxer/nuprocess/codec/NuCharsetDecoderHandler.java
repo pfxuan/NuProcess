@@ -52,5 +52,5 @@ public interface NuCharsetDecoderHandler
     * @param decoderResult a {@link CoderResult} signifying whether an error was
     *        encountered decoding stdout bytes
     */
-   void onDecode(CharBuffer buffer, boolean closed, CoderResult decoderResult);
+   boolean onDecode(CharBuffer buffer, boolean closed, CoderResult decoderResult);
 }
