@@ -115,7 +115,8 @@
                        <Bundle-Name>NuProcess</Bundle-Name>
                        <Export-Package>com.zaxxer.nuprocess</Export-Package>
                        <Export-Package>com.zaxxer.nuprocess.codec</Export-Package>
-                       <Import-Package>com.sun.*,sun.misc.*</Import-Package>
+                       <Export-Package>com.zaxxer.nuprocess.streams</Export-Package>
+                       <Import-Package>com.sun.*,sun.misc.*,org.reactivestreams.*</Import-Package>
                        <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
                    </instructions>
                </configuration>
