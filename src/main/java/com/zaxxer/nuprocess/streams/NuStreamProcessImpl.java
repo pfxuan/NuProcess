@@ -16,6 +16,8 @@
 
 package com.zaxxer.nuprocess.streams;
 
+import java.util.concurrent.TimeUnit;
+
 import com.zaxxer.nuprocess.NuProcess;
 import com.zaxxer.nuprocess.streams.NuStreamProcessBuilder.StreamProcessHandler;
 
@@ -24,6 +26,7 @@ public class NuStreamProcessImpl implements NuStreamProcess
    private NuStreamPublisher stdinPublisher;
    private NuStreamPublisher stdoutPublisher;
    private NuStreamPublisher stderrPublisher;
+   private NuProcess nuProcess;
 
    NuStreamProcessImpl()
    {
@@ -52,5 +55,28 @@ public class NuStreamProcessImpl implements NuStreamProcess
    public NuStreamPublisher getStderrPublisher()
    {
       return stderrPublisher;
+   }
+
+   @Override
+   public int waitFor(long timeout, TimeUnit timeUnit) throws InterruptedException
+   {
+      return nuProcess.waitFor(timeout, timeUnit);
+   }
+
+   @Override
+   public void destroy(boolean force)
+   {
+      nuProcess.destroy(force);
+   }
+
+   @Override
+   public boolean isRunning()
+   {
+      return nuProcess.isRunning();
+   }
+
+   void setStreamProcessHandler(NuProcess nuProcess)
+   {
+      this.nuProcess = nuProcess;
    }
 }

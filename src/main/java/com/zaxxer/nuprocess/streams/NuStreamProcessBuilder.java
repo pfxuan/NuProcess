@@ -35,12 +35,19 @@ public class NuStreamProcessBuilder
       this.builder = builder;
    }
 
+   public NuStreamProcess start()
+   {
+      return start(null);
+   }
+
    public NuStreamProcess start(final NuStreamProcessHandler streamProcessHandler)
    {
       NuStreamProcessImpl streamProcess = new NuStreamProcessImpl();
 
       builder.setProcessListener(new StreamProcessHandler(streamProcess, streamProcessHandler));
-      builder.start();
+      NuProcess nuProcess = builder.start();
+
+      streamProcess.setStreamProcessHandler(nuProcess);
 
       return streamProcess;
    }
@@ -71,13 +78,17 @@ public class NuStreamProcessBuilder
       public void onPreStart(final NuProcess nuProcess)
       {
          this.nuProcess = nuProcess;
-         streamProcessHandler.onPreStart(streamProcess);
+         if (streamProcessHandler != null) {
+            streamProcessHandler.onPreStart(streamProcess);
+         }
       }
 
       @Override
       public void onStart(final NuProcess nuProcess)
       {
-         streamProcessHandler.onStart(streamProcess);
+         if (streamProcessHandler != null) {
+            streamProcessHandler.onStart(streamProcess);
+         }
       }
 
       @Override
