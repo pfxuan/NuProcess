@@ -39,8 +39,17 @@ public class NuStreamProcessBuilder
    {
       return start(null);
    }
+   public NuStreamProcess start(final long numOfElements)
+   {
+      return start(null, numOfElements);
+   }
 
    public NuStreamProcess start(final NuStreamProcessHandler streamProcessHandler)
+   {
+      return start(streamProcessHandler, Long.MAX_VALUE);
+   }
+
+   public NuStreamProcess start(final NuStreamProcessHandler streamProcessHandler, final long numOfElements)
    {
       NuStreamProcessImpl streamProcess = new NuStreamProcessImpl();
 
@@ -50,7 +59,7 @@ public class NuStreamProcessBuilder
       NuProcess nuProcess = builder.start();
 
       streamProcess.setNuProcess(nuProcess);
-      streamProcess.setStreamProcessHandler(bridgeProcessHandler);
+      streamProcess.setStreamProcessHandler(bridgeProcessHandler, numOfElements);
 
       return streamProcess;
    }

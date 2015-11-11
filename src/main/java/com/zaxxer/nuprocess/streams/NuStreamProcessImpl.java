@@ -34,9 +34,14 @@ public class NuStreamProcessImpl implements NuStreamProcess
 
    void setStreamProcessHandler(final BridgeProcessHandler processHandler)
    {
-      stdinPublisher = new NuStreamPublisher(processHandler, NuProcess.Stream.STDIN);
-      stdoutPublisher = new NuStreamPublisher(processHandler, NuProcess.Stream.STDOUT);
-      stderrPublisher = new NuStreamPublisher(processHandler, NuProcess.Stream.STDERR);
+      setStreamProcessHandler(processHandler, Long.MAX_VALUE);
+   }
+
+   void setStreamProcessHandler(final BridgeProcessHandler processHandler, final long numOfElements)
+   {
+      stdinPublisher = new NuStreamPublisher(processHandler, NuProcess.Stream.STDIN, numOfElements);
+      stdoutPublisher = new NuStreamPublisher(processHandler, NuProcess.Stream.STDOUT, numOfElements);
+      stderrPublisher = new NuStreamPublisher(processHandler, NuProcess.Stream.STDERR, numOfElements);
    }
 
    @Override

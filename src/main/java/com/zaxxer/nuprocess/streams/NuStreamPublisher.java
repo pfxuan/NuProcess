@@ -29,11 +29,18 @@ public class NuStreamPublisher implements Publisher<ByteBuffer>
 {
    private final BridgeProcessHandler processHandler;
    private Stream stream;
+   private long numOfElements;
 
    NuStreamPublisher(final BridgeProcessHandler processHandler, final Stream stream)
    {
+      this(processHandler, stream, Long.MAX_VALUE);
+   }
+
+   NuStreamPublisher(final BridgeProcessHandler processHandler, final Stream stream, long numOfElements)
+   {
       this.processHandler = processHandler;
       this.stream = stream;
+      this.numOfElements = numOfElements;
    }
 
    @Override
@@ -45,8 +52,13 @@ public class NuStreamPublisher implements Publisher<ByteBuffer>
 
       processHandler.setSubscriber(stream, subscriber);
 
-      NuStreamSubscription subscription = new NuStreamSubscription();
-      subscriber.onSubscribe(subscription);
+      if (numOfElements == Long.MAX_VALUE) {
+         // infinite stream
+         subscriber.onSubscribe(new NuStreamSubscription());
+      } else {
+         // finite stream
+         subscriber.onSubscribe(new NuStreamSubscription2(subscriber));
+      }
    }
 
    class NuStreamSubscription implements Subscription
@@ -73,4 +85,45 @@ public class NuStreamPublisher implements Publisher<ByteBuffer>
          }
       }
    }
+
+   class NuStreamSubscription2 implements Subscription
+   {
+      private Subscriber subscriber;
+
+      public NuStreamSubscription2(Subscriber subscriber) {
+         this.subscriber = subscriber;
+      }
+
+      @Override
+      public void cancel()
+      {
+         if (stream != null) {
+            final Stream s = stream;
+            stream = null;
+            processHandler.cancel(s);
+         }
+      }
+
+      @Override
+      public void request(long n)
+      {
+         if (n < 1) {
+            throw new IllegalArgumentException("Subscription.request() value cannot be less than 1");
+         }
+
+         if (stream != null) {
+            for (int i = 0; i < n; i++) {
+               if (numOfElements > 0) {
+                  processHandler.request(stream, 1);
+                  //subscriber.onNext(ByteBuffer buffer);
+                  numOfElements--;
+               } else {
+                  subscriber.onComplete();
+               }
+            }
+         }
+      }
+   }
+
+
 }
