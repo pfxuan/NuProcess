@@ -81,20 +81,21 @@ public class NuStreamProcessBuilder
       }
 
       @Override
+      public void onExit(int statusCode)
+      {
+         // TODO do we ever need to call stdinSubscriber.onError() ?
+         stdinSubscriber.onComplete();
+         stdinRequests.set(-1);;
+
+         super.onExit(statusCode);
+      }
+
+      @Override
       public boolean onStdinReady(final ByteBuffer buffer)
       {
          stdinSubscriber.onNext(buffer);
          buffer.flip();
          return stdinRequests.decrementAndGet() > 0;
-      }
-
-      @Override
-      public void onExit(int statusCode)
-      {
-         // TODO do we ever need to call stdinSubscriber.onError() ?
-         stdinSubscriber.onComplete();
-
-         super.onExit(statusCode);
       }
 
       @Override
@@ -104,6 +105,7 @@ public class NuStreamProcessBuilder
 
          if (closed) {
             stdoutSubscriber.onComplete();
+            stdoutRequests.set(-1);
          }
 
          return !closed && stdoutRequests.decrementAndGet() > 0;
@@ -116,6 +118,7 @@ public class NuStreamProcessBuilder
 
          if (closed) {
             stderrSubscriber.onComplete();
+            stderrRequests.set(-1);
          }
 
          return !closed && stderrRequests.decrementAndGet() > 0;
